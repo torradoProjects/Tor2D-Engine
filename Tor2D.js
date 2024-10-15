@@ -408,10 +408,10 @@ class Tor2D
 				a.position.y + a.scale.y >= b.position.y && a.position.y <= b.position.y + b.scale.y)
 			{
 				b.trigger = true;
-				if (a.parent.is_trigger_enter !== undefined) a.parent.is_trigger_enter(b.parent);
+				if (a.is_trigger_enter !== undefined) a.is_trigger_enter(b.parent);
 			} else if (b.trigger)
 			{
-				if (a.parent.is_trigger_exit !== undefined) a.parent.is_trigger_exit(b.parent);
+				if (a.is_trigger_exit !== undefined) a.is_trigger_exit(b.parent);
 				b.trigger = false;
 			}
 		} 
