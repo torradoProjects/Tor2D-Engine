@@ -336,7 +336,7 @@ Elimina todos los datos guardados en el almacenamiento local del navegador.
 deleteAllData(); // Borra todos los datos guardados
 ```
 
-## Clase `Vector2`
+## `Vector2`
 
 La clase `Vector2` representa un vector bidimensional con componentes `x` e `y`, que es útil para manipular posiciones, movimientos y direcciones en un espacio 2D dentro del motor Tor2D. A continuación se detallan los métodos principales de la clase y sus usos.
 
@@ -416,7 +416,7 @@ let v2 = new Vector2(5, 7);
 let result = v1.subtract(v2); // Devuelve Vector2(5, 13)
 ```
 
-## Objeto `Camera`
+## `Camera`
 
 La cámara en Tor2D es responsable de seguir a un objeto dentro de la escena, aplicar transformaciones al canvas y controlar el nivel de zoom. También maneja la renderización de elementos anclados a la cámara, como fondos de parallax. A continuación, se describen las funciones más importantes que el usuario puede utilizar.
 
@@ -445,7 +445,7 @@ Ajusta el nivel de zoom de la cámara. Un valor de 1 representa un zoom normal, 
 Camera.setZoom(2); // Acerca la cámara, haciendo que los elementos se vean más grandes.
 ```
 
-### Objeto `Timer`
+### `Timer`
 
 La clase `Timer` se utiliza para gestionar tiempos de espera en el motor de juego. Puede esperar una cantidad de tiempo especificada antes de ejecutar una función, lo cual es útil para temporizadores, retrasos en eventos, o cualquier lógica dependiente del tiempo.
 
@@ -456,7 +456,9 @@ La clase `Timer` se utiliza para gestionar tiempos de espera en el motor de jueg
 
   **Uso**:
   ```javascript
+  // dentro de la función ready de la escena
   let timer = new Timer(2); // Temporizador de 2 segundos
+  this.add_child(timer); // se añade a la escena
   timer.loop = true; // El temporizador se repetirá indefinidamente
   ```
   - **Metodos**:
