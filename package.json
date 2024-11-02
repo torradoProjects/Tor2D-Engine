@@ -1,0 +1,15 @@
+{
+  "name": "tor2d-engine",
+  "version": "2.0",
+  "main": "webpack.config.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "TorradoProjects",
+  "license": "ISC",
+  "description": "Este es un pequeño proyecto personal de aprendisaje, son libres de usar y modificar como deseen."
+}

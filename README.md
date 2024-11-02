@@ -1,8 +1,9 @@
-# Tor2D
+# TOR2D
 Un motor de juego 2D ligero escrito en JavaScript.
+Sitio Web TorradoProjects: https://torradoprojects.github.io/site/
 
 ## Descripción
-Tor2D es un motor de juego 2D ligero escrito en JavaScript, ideal para crear juegos sencillos como clickers, juegos de plataformas, RPG y títulos casuales. Ofrece una estructura básica pero flexible que permite a los desarrolladores centrarse en la mecánica del juego sin preocuparse por configuraciones complejas. Con Tor2D, es fácil manejar sprites, animaciones, físicas simples y detectar colisiones, lo que lo convierte en una excelente opción para prototipos rápidos o proyectos pequeños.
+TOR2D es un motor de juego 2D ligero escrito en JavaScript, ideal para crear juegos sencillos como clickers, juegos de plataformas, RPG y títulos casuales. Ofrece una estructura básica pero flexible que permite a los desarrolladores centrarse en la mecánica del juego sin preocuparse por configuraciones complejas. Con Tor2D, es fácil manejar sprites, animaciones, físicas simples y detectar colisiones, lo que lo convierte en una excelente opción para prototipos rápidos o proyectos pequeños.
 
 ## Características principales
 - Fácil de integrar y comenzar a desarrollar juegos.
@@ -14,7 +15,7 @@ Tor2D es un motor de juego 2D ligero escrito en JavaScript, ideal para crear jue
 - Ideal para juegos sencillos como clickers, plataformas, RPG y juegos casuales.
 
 ## Instalación
-Para comenzar a utilizar Tor2D, puedes clonar el repositorio desde GitHub:
+Para comenzar a utilizar TOR2D, puedes clonar el repositorio desde GitHub:
 
 ```bash
 git clone https://github.com/torradoProjects/Tor2D-Engine.git
@@ -31,138 +32,54 @@ A continuación, se muestra un ejemplo básico de cómo configurar y usar el mot
 
 ### Configuración
 
-Primero, se debe definir una configuración básica para el juego, que incluye el lienzo donde se va a renderizar, el tamaño de la ventana, y otras opciones como el suavisado de texturas y el debug para mostrar colisiones y contador de FPS:
+Primero, se debe definir una configuración básica para el juego, que incluye el contenedor de el  lienzo donde se va a renderizar, el tamaño de la ventana, y otras opciones como el suavisado de texturas y el debug para mostrar colisiones y contador de FPS y el color del fondo:
 
 ```javascript
 let config = {
-    canvas: "canvas",
-    width: window.innerWidth,
-    height: window.innerHeight,
+    container: "contenedor",
+    width: 800,
+    height: 600,
     texture_filter: false,
-    debugs: false
+    debugs: false,
+    color: "gray"
 };
 
-let tom = new Tor2D(config);
-
-// Creación de objetos
-// Se pueden crear objetos en la escena como personajes animados, plataformas, colisionadores, botones y más:
-
-let pers, animRun, animIdle, animJumpDown, animJumpUp;
-let speed = 400;
-let piso, plataforma, box, btn, particle, sound;
-
-let Game = {
-    name: "Game",
-    ready: function() { // funcion ready se ejecuta una sola vez, es donde se cargan imagenes sonidos y se crean objetos
-
-        animIdle = new SpriteSheet("idle", "img/pers_idle.png", 4, 1); // objeto que crea un recorte de una imagen 
-        animRun = new SpriteSheet("run", "img/pers_run.png", 6, 1);
-        animJumpDown = new SpriteSheet("jump_down", "img/pers_jump_down.png", 3, 1);
-        animJumpUp = new SpriteSheet("jump_up", "img/pers_jump_up.png", 3, 1);
-        let anim = [animIdle, animRun, animJumpUp, animJumpDown];
-        
-        pers = new AnimatedSprite("player", new Vector2(100, 50), new Vector2(100, 100), anim, 0.08);
-        this.add_child(pers); // añade el objeto a la escena
-        
-        // Definición de colisionadores
-        pers.colis = new BoxCollider("colision", new Vector2(15, 5), new Vector2(60, 90), 0, [1, 2], "CharacterBody");
-        pers.add_child(pers.colis);
-        pers.layer = 2;
-
-        // Creación de una plataforma y colisionador
-        piso = new RenderShape("piso", new Vector2(10, 400), new Vector2(1800, 50), "Rectangle", "brown");
-        piso.colis = new BoxCollider("colision", new Vector2(), new Vector2(1800, 50), 1, [0, 2], "Static");
-        piso.add_child(piso.colis);
-        this.add_child(piso);
-
-        // Otras plataformas, colisionadores y objetos
-        plataforma = new RenderShape("plataforma", new Vector2(300, 250), new Vector2(400, 30), "Rectangle", "brown");
-        plataforma.colis = new BoxCollider("colision", new Vector2(), new Vector2(400, 30), 1, [0, 2], "Plataform");
-        plataforma.add_child(plataforma.colis);
-        this.add_child(plataforma);
-
-        box = new Sprite("box", new Vector2(300, 100), new Vector2(50, 50), "img/pelota.png");
-        box.colis = new BoxCollider("colision", new Vector2(), new Vector2(50, 50), 2, [0, 1], "RigidBody");
-        box.add_child(box.colis);
-        this.add_child(box);
-
-        Camera.follow(pers); // asigna a la camara el objeto que va a seguir
-
-        // Fondo y parallax
-        let bg = new ParallaxBackground("bg", new Vector2());
-        this.add_child(bg);
-        let layer0 = new ParallaxLayer("layer0", new Vector2(), new Vector2(config.width, config.height), "img/bg_0.png", 1);
-        let layer1 = new ParallaxLayer("layer1", new Vector2(), new Vector2(config.width, config.height), "img/bg_1.png", 2);
-        bg.add_child(layer0);
-        bg.add_child(layer1);
-
-        // Sonido y botón
-        sound = new AudioPlayer("audio", new Vector2(), "audio/poin.ogg");
-        box.add_child(sound);
-
-        pause_scene(true); // pausa la escena al empezar 
-
-        // boton play en el UI
-        btn = new TextureButton("play", new Vector2(500, 300), new Vector2(200, 200), "img/up.png", "img/down.png");
-        this.add_child(btn);
-
-        // Partículas
-        particle = new ParticleSystem(new Vector2(50, 100), "0, 100, 150");
-        pers.add_child(particle);
-    },
-    
-    // Lógica del juego (control de personajes y colisiones)
-    process: function(delta) {
-        if (!box.is_in_floor()) box.velocity.y += 1800 * delta;
-        if (!pers.is_in_floor()) pers.velocity.y += 1500 * delta;
-
-        let moveX = Input.isKeyDown("KeyD") - Input.isKeyDown("KeyA");
-        pers.velocity.x = moveX * speed;
-        pers.flip_h = Input.isKeyDown("KeyA");
-
-        if (Input.isKeyDown("Space") && pers.is_in_floor()) pers.velocity.y = -600;
-
-        // Animaciones basadas en el movimiento
-        if (pers.velocity.x != 0) {
-            pers.play("run");
-            particle.emit();
-        } else if (!pers.is_in_floor() && pers.velocity.y > 0) {
-            pers.play("jump_down");
-        } else if (pers.velocity.y < 0) {
-            pers.play("jump_up");
-        } else {
-            pers.play("idle");
-        }
-
-        if (box.is_in_floor()) {
-            box.velocity.y = -600;
-            sound.play();
-        }
-
-        // Acción del botón
-        btn.is_released = function() {
-            sound.play();
-            pause_scene(false);
-            btn.visible = false;
-        };
-    }
+let tor2d = new TOR2D(config);
+let label, grados = 0;
+let Main =
+{
+  name: "Main",
+  ready() // funcion que se ejecuta una sola vez 
+  {
+    // aqui se crean y se añaden los objetos a la escena
+    label = new Label("¡hola mundo!", new Vector2(200, 100), 50, "Verdana", "blue"); // se crea un objeto Label
+    this.add_child(label); // se añade a la escena para ser renderizado y procesado
+  },
+  process(delta) // funcion que se ejecuta cada frame 
+  {
+    // aqui la logica de el juego
+    if (grados < 360)
+    {
+      label.setRotation(grados); // se aplica rotacion al objeto Label
+      grados++;
+    } else grados = 0;
+  }
 };
-
-// Iniciar el juego
-tom.start(Game);
-````
+tor2d.start(Main); // inicia la escena Main 
+```
 
 ## Funciones principales
 
 Tor2D incluye una serie de funciones útiles para el desarrollo de juegos 2D. A continuación se presentan las más importantes:
 
-### `Tor2D(config)`
+### `TOR2D(config)`
 Constructor principal que inicializa el motor con la configuración especificada. Recibe un objeto `config` que debe contener los siguientes parámetros:
-- `canvas`: ID del elemento canvas donde se dibujará el juego.
+- `container`: ID del elemento div que va a servir como contenedor.
 - `width`: Ancho del área de juego.
 - `height`: Alto del área de juego.
 - `texture_filter`: Habilita o deshabilita los filtros de texturas (para suavizado de gráficos).
 - `debugs`: Modo de depuración para mostrar colisiones y otros datos.
+- `color`: (Opcional, por defecto es `gray`) Aplica un color de fondo al lienzo.
 
 ### `add_scene(scene)`
 
@@ -179,49 +96,56 @@ Si la escena no tiene un nombre, el motor le asigna un número basado en el orde
 ```javascript
 let gameScene = {
   name: "Nivel1",
-  ready: function() {
-    let player = new AnimatedSprite("player", new Vector2(100, 100), new Vector2(50, 50), [animIdle], 0.1);
-    this.add_child(player);
+  ready() 
+  {
+    let label = new Label("¡Hola mundo!", new Vector2(200, 200), 50, "Verdana", "blue");
+    this.add_child(label);
   }
 };
 
-let tor2d = new Tor2D(config);
-tor2d.add_scene(gameScene);
+let tor2d = new TOR2D(config);
+tor2d.add_scene(gameScene); // añade a gameScene al arbol de escenas
 ```
 
 ### `change_scene(scene)`
 
-Este método permite cambiar entre diferentes escenas dentro del motor `Tor2D`. Al cambiar de escena, el motor se encarga de realizar una serie de tareas para asegurar que la transición entre escenas sea fluida, limpiando la escena anterior y cargando la nueva.
+Este método permite cambiar entre diferentes escenas dentro del motor `TOR2D`. Al cambiar de escena, el motor se encarga de realizar una serie de tareas para asegurar que la transición entre escenas sea fluida, limpiando la escena anterior y cargando la nueva.
 
 #### Ejemplo de uso:
 
 ```javascript
-let menuScene = {
+let menuScene = 
+{
   name: "Menu",
-  ready: function() {
+  ready() 
+  {
     let playButton = new TextureButton("play", new Vector2(100, 100), new Vector2(200, 100), "img/play.png", "img/play_hover.png");
     this.add_child(playButton);
   },
-  process: function(){
-    playButton.is_pressed = function()
+  process()
+  {
+    if (playButton.isPressed())
     {
-        // Cambiar de la escena de menú a la escena de juego
-        tor2d.change_scene(gameScene);
-    };
+      // Cambiar de la escena de menú a la escena de juego
+      tor2d.change_scene(gameScene);
+    }
+    
   }
 };
 
-let gameScene = {
+let gameScene = 
+{
   name: "Game",
-  ready: function() {
+  ready() 
+  {
     let player = new AnimatedSprite("player", new Vector2(100, 100), new Vector2(50, 50), [animIdle], 0.1);
     this.add_child(player);
   }
 };
 
-let tor2d = new Tor2D(config);
-tor2d.add_scene(gameScene);
-tor2d.start(menuScene);
+let tor2d = new TOR2D(config); // se crea el motor de juego
+tor2d.add_scene(gameScene); // se añade la escena gameScene al arbol de escenas
+tor2d.start(menuScene); // se inicia la escena menuScene como principal
 ```
 
 ### `start(scene)`
@@ -232,18 +156,21 @@ El método `start(scene)` es el encargado de iniciar el ciclo principal (loop) d
 #### Ejemplo de uso:
 
 ```javascript
-let mainScene = {
+let mainScene = 
+{
   name: "MainScene",
-  ready: function() {
+  ready() 
+  {
     let player = new AnimatedSprite("player", new Vector2(100, 100), new Vector2(50, 50), [animIdle], 0.1);
     this.add_child(player);
   },
-  process: function(delta) {
+  process(delta) 
+  {
     // Lógica de actualización por fotograma
   }
 };
 
-let tor2d = new Tor2D(config);
+let tor2d = new TOR2D(config);
 tor2d.start(mainScene); // Inicia el motor de juego con la escena 'mainScene'
 ```
 
@@ -276,7 +203,7 @@ event("click", function() {
 ### `isVisible(obj)`
 Verifica si un objeto está dentro del área visible de la cámara. Devuelve true si el objeto es visible en la cámara y false en caso contrario.
 - **Parámetro:**:
-  - `obj`: El objeto cuya visibilidad se desea comprobar. Este objeto debe tener las propiedades `position` (posición) y `scale` (tamaño).
+  - `obj`: El objeto cuya visibilidad se desea comprobar. Este objeto debe tener las propiedades `position` (posición) y `size` (tamaño).
 
 #### Ejemplo de uso:
 ```javascript
@@ -334,6 +261,30 @@ Elimina todos los datos guardados en el almacenamiento local del navegador.
 #### Ejemplo de uso:
 ```javascript
 deleteAllData(); // Borra todos los datos guardados
+```
+
+### `random(min, max)`
+Funcion que devuelve un numero aleatorio entre el minimo y el maximo
+
+#### Ejemplo de uso:
+```javascript
+random(2, 50); // devuelve un numero entre 2 y 50
+```
+
+### `min(min, max)`
+Funcion que devuelve el valor minimo de dos valores
+
+#### Ejemplo de uso:
+```javascript
+min(2, 50); // devuelve 2
+```
+
+### `max(min, max)`
+Funcion que devuelve el valor maximo de dos valores
+
+#### Ejemplo de uso:
+```javascript
+max(2, 50); // devuelve 50
 ```
 
 ## `Vector2`
@@ -526,10 +477,10 @@ La clase `Label` se utiliza para renderizar texto en la interfaz de usuario (UI)
 #### Constructor:
 
 ```javascript
-constructor(text, pos, size, font, color) 
+constructor(text, position, size, font, color) 
 ```
 - **text**: El contenido del texto que se va a renderizar.
-- **pos**: Un objeto `Vector2` que representa la posición inicial del texto en la pantalla.
+- **position**: Un objeto `Vector2` que representa la posición inicial del texto en la pantalla.
 - **size**: El tamaño del texto en píxeles.
 - **font**: La fuente del texto (por ejemplo, `Arial`, `Verdana`, etc.).
 - **color**: El color del texto en formato de cadena (por ejemplo, `black`, `#FFFFFF`, etc.).
@@ -537,11 +488,16 @@ constructor(text, pos, size, font, color)
  #### Ejemplo de Uso:
  ```javascript
  let label = new Label("Puntuación", new Vector2(100, 50), 24, "Arial", "white");
+ this.add_child(label);
  ```
  #### Propiedades:
 
  - **visible**: Determina si el texto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el texto, por defecto todos son `0`.
+
+ #### Metodo:
+
+ - **setRotation(grados)**: Aplica una rotacion segun los grados 
 
  #### Ejemplo de Uso:
  ```javascript
@@ -549,6 +505,8 @@ constructor(text, pos, size, font, color)
  let estrellas = new Label("100", new Vector2(100, 50), 24, "Arial", "white");
  this.add_child(puntos);
  this.add_child(estrellas);
+
+ estrellas.setRotation(45); // se aplica una rotacion de 45 grados
  // segun el orden de creacion, estrellas se renderiza sobre puntos
 
  puntos.layer = 1; // ahora los puntos se renderizan sobre las estrellas
@@ -562,26 +520,28 @@ constructor(text, pos, size, font, color)
 
 ### `Button`
 
- La clase `Button` permite crear botones interactivos dentro de la interfaz de usuario del motor de juego Tor2D, ofreciendo personalización de los colores del botón, tanto en estado normal como cuando está presionado.
+ La clase `Button` permite crear botones interactivos dentro de la interfaz de usuario del motor de juego TOR2D, ofreciendo personalización de los colores del botón, tanto en estado normal como cuando está presionado.
 
 #### Constructor:
 
 ```javascript
-constructor(name, pos, scale, color, borderColor, pressedColor) 
+constructor(name, position, size, color, borderColor, pressedColor) 
 ```
 - **name**: `String` - Nombre del botón para su identificación.
-- **pos**: `Vector2` - Posición en pantalla donde se dibujará el botón.
-- **scale**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
+- **position**: `Vector2` - Posición en pantalla donde se dibujará el botón.
+- **size**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
 - **color**: `String` - (opcional) - Color del botón en estado normal. Si no se especifica, el valor por defecto es blanco.
 - **borderColor**: `String` - (opcional) - Color del borde del botón. Si no se especifica, el valor por defecto es negro.
 - **pressedColor**: `String` - (opcional) - Color del botón cuando está presionado. Si no se especifica, el valor por defecto es gris.
 
 #### Propiedades:
 
- - **visible**: Determina si el objeto es visible o no (booleano), por defecto todos son `true`.
+ - **visible**: Determina si el objeto es visible o no, (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
- - **is_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
- - **is_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
+ - **is_action_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
+ - **is_action_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
+ - **disabled**: Desactiva el boton, por defecto es `false`.
+ - **scale**: Escala el tamaño del boton, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
  #### Ejemplo de Uso:
  ```javascript
@@ -590,19 +550,21 @@ let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50),
 this.add_child(button); // se añade a la escena
 
 // dentro de la funcion ready o process de la escena
-button.is_pressed = function() {
+button.is_action_pressed = function() {
     console.log("Botón presionado");
 };
 
-button.is_released = function() {
+button.is_action_released = function() {
     console.log("Botón soltado");
 };
+
  ```
 
  #### Metodos:
 
- - `getPressed`: funcion que devuelve `true` si es presionado.
- - `add_child`: Añade un objeto hijo a el boton. Este método solo permite el  objeto `Label`. 
+ - `isPressed()`: funcion que devuelve `true` si es presionado.
+ - `add_child(objeto)`: Añade un objeto hijo a el boton. Este método solo permite el  objeto `Label`. 
+ - `setRotation(grados)`: Aplica una rotacion segun los grados.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -611,7 +573,7 @@ let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50),
 this.add_child(button); // se añade a la escena
 
 // dentro de la funcion process de la escena
-if (button.getPressed())
+if (button.isPressed())
 {
     console.log("Botón presionado");
 } else console.log("Botón soltado");
@@ -625,11 +587,11 @@ if (button.getPressed())
 #### Constructor:
 
 ```javascript
-constructor(name, pos, scale, texture_normal, texture_pressed)
+constructor(name, position, size, texture_normal, texture_pressed)
 ```
 - **name**: `String` - Nombre del botón para su identificación.
-- **pos**: `Vector2` - Posición en pantalla donde se dibujará el botón.
-- **scale**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
+- **position**: `Vector2` - Posición en pantalla donde se dibujará el botón.
+- **size**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
 - **texture_normal**: `path_to_image` - La textura que se muestra cuando el botón no está presionado.
 - **texture_pressed**: `path_to_image` - La textura que se muestra cuando el botón está presionado.
 
@@ -637,8 +599,10 @@ constructor(name, pos, scale, texture_normal, texture_pressed)
 
  - **visible**: Determina si el objeto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
- - **is_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
- - **is_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
+ - **is_action_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
+ - **is_action_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
+ - **disabled**: Desactiva el boton, por defecto es `false`.
+ - **scale**: Escala el tamaño del boton, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
  #### Ejemplo de Uso:
  ```javascript
@@ -647,18 +611,19 @@ let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50),
 this.add_child(button); // se añade a la escena
 
 // dentro de la funcion ready o process de la escena
-button.is_pressed = function() {
+button.is_action_pressed = function() {
     console.log("Botón presionado");
 };
 
-button.is_released = function() {
+button.is_action_released = function() {
     console.log("Botón soltado");
 };
  ```
+#### Metodos:
 
- #### Metodo:
-
- - `getPressed`: funcion que devuelve `true` si es presionado.
+ - `isPressed()`: funcion que devuelve `true` si es presionado.
+ - `add_child(objeto)`: Añade un objeto hijo a el boton. Este método solo permite el  objeto `Label`. 
+ - `setRotation(grados)`: Aplica una rotacion segun los grados.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -667,7 +632,7 @@ let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50),
 this.add_child(button); // se añade a la escena
 
 // dentro de la funcion process de la escena
-if (button.getPressed())
+if (button.isPressed())
 {
     console.log("Botón presionado");
 } else console.log("Botón soltado");
@@ -681,11 +646,11 @@ if (button.getPressed())
 #### Constructor:
 
 ```javascript
-constructor(name, pos, scale, texture_outer, texture_inner, maxDistance = 50)
+constructor(name, position, size, texture_outer, texture_inner, maxDistance = 50)
 ```
 - **name**: `String` - Nombre del joystick para su identificación.
-- **pos**: `Vector2` - Posición en pantalla donde se dibujará el joystick.
-- **scale**: `Vector2` - Tamaño del joystick , definido por su ancho y alto.
+- **position**: `Vector2` - Posición en pantalla donde se dibujará el joystick.
+- **size**: `Vector2` - Tamaño del joystick , definido por su ancho y alto.
 - **texture_outer**: `path_to_image` - La textura utilizada para el aro exterior del joystick (parte fija). 
 - **texture_inner**: `path_to_image` - La textura utilizada para el círculo interior del joystick (parte móvil).
 - **maxDistance**: `Int` - La distancia máxima que el círculo interior puede moverse desde el centro del joystick. Por defecto es 50 píxeles.
@@ -726,12 +691,12 @@ La clase `Texture` permite renderizar imágenes o texturas en pantalla en un ent
 #### Constructor
 
 ```javascript
-constructor(name, pos, scale, path)
+constructor(name, position, size, path)
 ```
 - **name**: `String` - El nombre de la textura, utilizado para identificarla.
-- **pos**: `Vector2` - La posición en la que se dibujará la textura en la pantalla.
-- **scale**: `Vector2` - La escala de la textura, representando su tamaño en píxeles (ancho y alto).
-- **path**: `String` - La ruta de la imagen que se cargará como textura.
+- **position**: `Vector2` - La posición en la que se dibujará la textura en la pantalla.
+- **size**: `Vector2` - La escala de la textura, representando su tamaño en píxeles (ancho y alto).
+- **path**: `String` o `SpriteSheet` - La ruta de la imagen que se cargará como textura, o un objeto `SpriteSheet`.
 
 #### Propiedades:
 
@@ -739,19 +704,31 @@ constructor(name, pos, scale, path)
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
  - **flip_h**: Indica si la textura debe ser volteada horizontalmente. Por defecto es `false`.
  - **flip_v**: Indica si la textura debe ser volteada verticalmente. Por defecto es `false`.
+ - **scale**: Escala el tamaño de la textura, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
+ - **color**: Aplica un color sobre la textura, por defecto es `null`.
+ - **alpha**: Aplica una transparencia a la textura, por defecto es  `1`.
 
 #### Metodo:
 
- - `add_child`: Añade un objeto hijo a la textura. Este método solo permite los siguientes objetos: `Label`, `Button`, `TextureButton`, `Joystick` y `Texture`.
+ - `add_child(objeto)`: Añade un objeto hijo a la textura. Este método solo permite los siguientes objetos: `Label`, `Button`, `TextureButton`, `Joystick` y `Texture`.
+ - `setRotation(grados)`: Aplica rotación a la textura segun los grados.
 
 #### Ejemplo de Uso:
  ```javascript
  // dentro de la funcion ready de la escena
 let fondo_gameOver = new Texture("fondo_gameOver", new Vector2(50, 300), new Vector2(100, 100), "path/texture.png");
+
+// si quieres cargar un recorte de una imagen como textura
+let recorte = new SpriteSheet("recorte", new Vector2(), new Vector2(1, 1), new Vector2(64, 64), "path/tileset_64X64.png");
+
+let fondo2_gameOver = new Texture("fondo_gameOver", new Vector2(100, 300), new Vector2(100, 100), recorte);
+
 let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50), "buttonNormal.png", "buttonPressed.png");
 
 this.add_child(fondo_gameOver); // se añade a la escena
+this.add_child(fondo2_gameOver); // se añade a la escena
 fondo_gameOver.add_child(button); // añade el boton como hijo de la Textura 
+fondo_gameOver.setRotation(45); // se le aplica rotacion a la textura y a los hijos
 
  ```
 ## Objetos del Mundo:
@@ -762,32 +739,67 @@ fondo_gameOver.add_child(button); // añade el boton como hijo de la Textura
 
 #### Constructor:
 ```javascript
-constructor(name, pos, scale)
+constructor(name, position, size)
 ```
 - **name**: `String` - Nombre del objeto.
-- **pos**: `Vector2` - Posición inicial del objeto
-- **scale**: `Vector2` - Escala del objeto
+- **position**: `Vector2` - Posición inicial del objeto
+- **size**: `Vector2` - Escala del objeto
 
 #### Propiedades:
 
  - **visible**: Determina si el objeto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
  - **velocity**: Es un `Vector2` usado para aplicar velocidad a el objeto.
+ - **scale**: Escala el tamaño del objeto, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
 #### Metodos:
 
- - `is_in_floor`: Devuelve `true` si el objeto está en el suelo.
- - `destroy`: Elimina el objeto de su padre.
- - `add_child`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `is_in_floor()`: Devuelve `true` si el objeto está en el suelo.
+ - `is_in_floor_only()`: Devuelve `true` si el objeto está en el suelo la primera  vez.
+ - `is_in_wall()`: Devuelve `true` si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_wall_only()`: Devuelve `true` una unica vez, si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_ceiling()`: Devuelve `true` si el objeto está en el cielo.
+ - `is_in_ceiling_only()`: Devuelve `true` si el objeto está en el cielo la primera vez.
+ - `destroy()`: Elimina el objeto de su padre.
+ - `add_child(objeto)`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `setRestitution(restitution)`: Aplica un rebote al colisionar.
+ - `instantiate()`: Permite añadir varios objetos simultaneamente a la escena.
+ - `apply_impulse(x, y)`: Aplica un impulso al objeto.
+ - `setRotation(grados)`: Aplica rotacion al objeto y a los hijos 
 
 #### Ejemplo de Uso:
  ```javascript
- // dentro de la funcion ready de la escena
-let player = new GameObject("player", new Vector2(50, 300), new Vector2(100, 100));
-let sprite = new Sprite("sprite_player", new Vector2(50, 50), new Vector2(150, 50), "sprite.png");
-
-this.add_child(player); // se añade a la escena
-player.add_child(sprite); // añade como hijo de el objeto 
+ let obj = [];
+let ground;
+let Main =
+{
+    name: "Main",
+    ready()
+    {
+        ground = new SpriteSheet("ground", new Vector2(), new Vector2(1, 1), new Vector2(64, 64), "./assets/tileset.png");
+        
+        let time = new Timer(1);
+        this.add_child(time);
+        time.start(()=>{
+            let fondo = new Sprite("ground", new Vector2(200, 300), new Vector2(64, 64), ground);
+            fondo.instantiate();
+            this.add_child(fondo);
+            obj.push(fondo);
+            fondo.velocity.x -= 100;
+        });
+        
+    },
+    process(delta)
+    {
+        obj.forEach(o =>{
+            if (o.position.x + o.size.x < 0) 
+            {
+                o.destroy();
+                print(`el objeto ${o.name} fue eliminado`);
+            }
+        });
+    }
+}
  ```
 
 ### `RenderShape`
@@ -796,11 +808,11 @@ player.add_child(sprite); // añade como hijo de el objeto
 
 #### Constructor:
 ```javascript
-constructor(name, pos, scale, shape, color)
+constructor(name, position, size, shape, color)
 ```
 - **name**: `String` - Nombre del objeto.
-- **pos**: `Vector2` - Posición inicial del objeto
-- **scale**: `Vector2` - Escala del objeto
+- **position**: `Vector2` - Posición inicial del objeto
+- **size**: `Vector2` - tamaño del objeto (ancho, alto).
 - **shape**: `String` - Tipo de forma a renderizar. Puede ser `Rectangle`, `Circle` o `Triangle`. Por defecto, es `Rectangle`.
 - **color**: `String` - Color de la forma en formato de `cadena`, `hexadecimal` o `RGBA`. Por defecto, es `white`.
 
@@ -808,13 +820,20 @@ constructor(name, pos, scale, shape, color)
 
  - **visible**: Determina si el objeto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
-- **velocity**: Es un `Vector2` usado para aplicar velocidad a el objeto.
+ - **velocity**: Es un `Vector2` usado para aplicar velocidad a el objeto.
+ - **scale**: Escala el tamaño del objeto, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
 #### Metodos:
 
- - `is_in_floor`: Devuelve `true` si el objeto está en el suelo.
- - `destroy`: Elimina el objeto de su padre.
- - `add_child`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `is_in_floor()`: Devuelve `true` si el objeto está en el suelo.
+ - `is_in_floor_only()`: Devuelve `true` si el objeto está en el suelo la primera  vez.
+ - `is_in_wall()`: Devuelve `true` si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_wall_only()`: Devuelve `true` una unica vez, si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_ceiling()`: Devuelve `true` si el objeto está en el cielo.
+ - `is_in_ceiling_only()`: Devuelve `true` si el objeto está en el cielo la primera vez.
+ - `destroy()`: Elimina el objeto de su padre.
+ - `add_child(objeto)`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `setRotation(grados)`: Aplica rotacion al objeto y a los hijos.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -831,10 +850,10 @@ La clase `Text` se utiliza para renderizar texto en el mundo. Es una clase simpl
 #### Constructor:
 
 ```javascript
-constructor(text, pos, size, font, color) 
+constructor(text, position, size, font, color) 
 ```
 - **text**: El contenido del texto que se va a renderizar.
-- **pos**: Un objeto `Vector2` que representa la posición inicial del texto en la pantalla.
+- **position**: Un objeto `Vector2` que representa la posición inicial del texto en la pantalla.
 - **size**: El tamaño del texto en píxeles.
 - **font**: La fuente del texto (por ejemplo, `Arial`, `Verdana`, etc.).
 - **color**: El color del texto en formato de cadena (por ejemplo, `black`, `#FFFFFF`, etc.).
@@ -843,6 +862,9 @@ constructor(text, pos, size, font, color)
 
  - **visible**: Determina si el texto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el texto, por defecto todos son `0`.
+ 
+ #### Metodo:
+ - `setRotation(grados)`: Aplica rotacion al objeto.
 
  #### Ejemplo de Uso:
  ```javascript
@@ -858,12 +880,12 @@ constructor(text, pos, size, font, color)
 
 #### Constructor:
 ```javascript
-constructor(name, pos, scale, path)
+constructor(name, position, size, path)
 ```
 - **name**: `String` - Nombre del objeto.
-- **pos**: `Vector2` - Posición inicial del objeto
-- **scale**: `Vector2` - Escala del objeto
-- **path**: `String` - Ruta de la imagen o textura que se va a renderizar.
+- **position**: `Vector2` - Posición inicial del objeto
+- **size**: `Vector2` - Escala del objeto
+- **path**: `String` o `SpriteSheet` - La ruta de la imagen que se cargará como textura, o un objeto `SpriteSheet`.
 
 #### Propiedades:
 
@@ -872,12 +894,20 @@ constructor(name, pos, scale, path)
  - **flip_h**: Indica si la textura debe ser volteada horizontalmente. Por defecto es `false`.
  - **flip_v**: Indica si la textura debe ser volteada verticalmente. Por defecto es `false`.
  - **velocity**: Es un `Vector2` usado para aplicar velocidad a el objeto.
+ - **color**: Aplica un color sobre la textura, por defecto es `null`.
+ - **alpha**: Aplica una transparencia sobre la textura, por defecto es `1`.
 
 #### Metodos:
 
- - `is_in_floor`: Devuelve `true` si el objeto está en el suelo.
- - `destroy`: Elimina el objeto de su padre.
- - `add_child`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `is_in_floor()`: Devuelve `true` si el objeto está en el suelo.
+ - `is_in_floor_only()`: Devuelve `true` si el objeto está en el suelo la primera  vez.
+ - `is_in_wall()`: Devuelve `true` si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_wall_only()`: Devuelve `true` una unica vez, si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_ceiling()`: Devuelve `true` si el objeto está en el cielo.
+ - `is_in_ceiling_only()`: Devuelve `true` si el objeto está en el cielo la primera vez.
+ - `destroy()`: Elimina el objeto de su padre.
+ - `add_child(objeto)`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `setRotation(grados)`: Aplica rotacion al objeto y a los hijos.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -887,24 +917,45 @@ let box = new Sprite("box", new Vector2(50, 300), new Vector2(100, 100), "box.pn
 this.add_child(box); // se añade a la escena
  ```
 
+#### Ejemplo de uso con SpriteSheet:
+```javascript
+// dentro de la funcion ready de la escena.
+let imageBox = new SpriteSheet("imageBox", new Vector2(0, 2), new Vector2(1, 1), new Vector2(16, 16), "tilemap_16X16.png"); // recortamos la imagen caja de la hoja de sprites 
+let box = new Sprite("box", new Vector2(50, 300), new Vector2(50, 50), imageBox); // creamos un objeto sprite con ese recorte
+this.add_child(box); // añadimos a la escena
+
+```
+
 ### `SpriteSheet`
 
 `SpriteSheet` es una clase diseñada para manejar y almacenar sprites de una hoja de sprites (sprite sheet). Esta clase permite dividir una imagen grande en múltiples sprites más pequeños, facilitando su uso en juegos y aplicaciones gráficas.
 
 #### Constructor:
 ```javascript
-constructor(name, path, colum, filas)
+constructor(name, position, frames, pixels, pathImage)
 ```
 
 - **name**: `String` - Nombre de la hoja de sprites.
-- **path**: `String` - Ruta de la imagen de la hoja de sprites que se va a cargar.
-- **colum**: `Int` - Numero de columnas.
-- **filas**: `Int` - Numero de filas.
+- **position**: `Vector2` - Origen del recorte.
+- **frames**: `Vector2` - cantidad de frames que se recortaran.
+- **pixels**: `Vector2` - ancho y alto en pixeles de cada frame.
+- **pathImage**: `String` - Ruta de la hoja de imagenes
 
 #### Ejemplo de Uso:
  ```javascript
  // dentro de la funcion ready de la escena
-let idle = new SpriteSheet("idle", "spriteSheet_idle.png", 4, 1);
+
+// si tengo una imagen que contiene varias imagenes y cada una de ellas son de 16 de ancho por 16 de alto y tiene 3 imagenes horizontal y 3 imagenes vertical, eso daria un total de 6 imagenes, y yo quiero recortar las dos primeras, se hace de la siguiente forma
+
+let img = new SpriteSheet("img", new Vector2(0, 0), new Vector2(2, 1), new Vector2(16, 16), "path/imagen16X16.png");
+/*
+El primer parametro img: es el nombre para identificar el recorte 
+El segundo parametro Vector2(0, 0): inicia el recorte en el punto cero, cero, si quisiera que empezara en el segundo frame de la segunda fila entonces seria Vector2(1, 1) ya que contariamos cada frame de la imagen de hizquierda a derecha y de arriba hacia bajo  empezando en cero.
+El tercer parametro Vector2(2, 1): calcula el tamaño del recorte si abiamos dicho que tomariamos dos primeras imagenes y cada una de ellas tiene 16X16 entonces estariamos recortando un tamaño de 16*2 de ancho y 16*1 de alto.
+El cuarto parametro Vector2(16, 16): se espesifica el tamaño de cada sprite en pixeles 
+El ultimo parametro "path/imagen16X16.png": es la ruta donde tienes la hoja de imagenes 
+
+*/ 
  ```
 
 ### `AnimatedSprite`
@@ -913,12 +964,12 @@ let idle = new SpriteSheet("idle", "spriteSheet_idle.png", 4, 1);
 
 #### Constructor:
 ```javascript
-constructor(name, pos, scale, animations, speed)
+constructor(name, position, size, animations, speed)
 ```
 
 - **name**: `String` - Nombre del objeto.
-- **pos**: `Vector2` - Posición inicial del objeto
-- **scale**: `Vector2` - Escala del objeto
+- **position**: `Vector2` - Posición inicial del objeto
+- **size**: `Vector2` - Escala del objeto
 - **animations**: `Array` - Array de objetos que contienen las animaciones disponibles para este sprite.
 - **speed**: `Float` - Velocidad de reproducción de la animación (en segundos por cuadro). Si no se proporciona, se establece en 0.3.
 
@@ -931,24 +982,30 @@ constructor(name, pos, scale, animations, speed)
  - **velocity**: Es un `Vector2` usado para aplicar velocidad a el objeto.
  - **loop**: Booleano que indica si la animación debe repetirse en bucle.
  - **animation_finish**: Booleano que indica si la animación ha terminado.
+ - **color**: Aplica un color sobre la textura, por defecto es `null`.
+ - **alpha**: Aplica transparencia sobre la textura, por defecto es `1`.
 
 #### Metodos:
 
- - `is_in_floor`: Devuelve `true` si el objeto está en el suelo.
- - `destroy`: Elimina el objeto de su padre.
- - `add_child`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
- - `play`: Inicia la animación especificada. Si la animación actual es diferente.
- - `stop`: Detiene la animación actual.
- - `animation_finish_name`: funcion `undefined` que devuelve el nombre de la animacion que finalizo.
+ - `is_in_floor()`: Devuelve `true` si el objeto está en el suelo.
+ - `is_in_floor_only()`: Devuelve `true` si el objeto está en el suelo la primera  vez.
+ - `is_in_wall()`: Devuelve `true` si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_wall_only()`: Devuelve `true` una unica vez, si el objeto está en uno de los lados de un objeto solido.
+ - `is_in_ceiling()`: Devuelve `true` si el objeto está en el cielo.
+ - `is_in_ceiling_only()`: Devuelve `true` si el objeto está en el cielo la primera vez.
+ - `destroy()`: Elimina el objeto de su padre.
+ - `add_child(objeto)`: Añade un hijo al objeto, objetos que permite: `Timer`, `GameObject`, `RenderShape`, `Text`, `Sprite`, `AnimatedSprite`, `AudioPlayer`, `ParticleSystem` y `BoxCollider`.
+ - `play(nombre_de_la_animacion)`: Inicia la animación especificada. Si la animación actual es diferente.
+ - `stop()`: Detiene la animación actual.
+ - `animation_finish_name(animacion_finalizada)`: funcion `undefined` que devuelve el nombre de la animacion que finalizo.
+ - `setRotation(grados)`: Aplica rotacion al objeto y a los hijos.
 
 #### Ejemplo de Uso:
  ```javascript
     // dentro de la funcion ready de la escena
-    animIdle = new SpriteSheet("idle", "img/pers_idle.png", 4, 1);
-    animRun = new SpriteSheet("run", "img/pers_run.png", 6, 1);
-    animJumpDown = new SpriteSheet("jump_down", "img/pers_jump_down.png", 3, 1);
-    animJumpUp = new SpriteSheet("jump_up", "img/pers_jump_up.png", 3, 1);
-    let animations = [animIdle, animRun, animJumpUp, animJumpDown];
+    animIdle = new SpriteSheet("idle", new Vector2(0, 0), new Vector2(3, 1), new Vector2(16, 16), "img/pers_16X16.png");
+    animRun = new SpriteSheet("run", new Vector2(0, 1), new Vector2(3, 1), new Vector2(16, 16), "img/pers_16X16.png");
+    let animations = [animIdle, animRun];
 
     pers = new AnimatedSprite("player", new Vector2(100, 50), new Vector2(100, 100), animations, 0.08);
     pers.play("idle"); // se inicia la animacion con el nombre de la clase SpriteSheet
@@ -971,10 +1028,10 @@ constructor(name, pos, scale, animations, speed)
 
 #### Constructor:
 ```javascript
-constructor(name, pos)
+constructor(name, position)
 ```
 - **name**: `String` - Nombre del objeto.
-- **pos**: `Vector2` - Posición inicial del objeto
+- **position**: `Vector2` - Posición inicial del objeto
 
 #### Propiedades:
 
@@ -998,13 +1055,13 @@ constructor(name, pos)
 
 #### Constructor:
 ```javascript
-constructor(name, pos, scale, image, moveSpeed)
+constructor(name, position, size, path, moveSpeed)
 ```
 
 - **name**: `String` - Nombre de la capa parallax.
-- **pos**: `Vector2` - Posición inicial de la capa.
-- **scale**: `Vector2` - Tamaño de la capa (ancho y alto).
-- **image**: `String` - Ruta de la imagen de la capa.
+- **position**: `Vector2` - Posición inicial de la capa.
+- **size**: `Vector2` - Tamaño de la capa (ancho y alto).
+- **path**: `String` o `SpriteSheet` - La ruta de la imagen que se cargará como capa, o un objeto `SpriteSheet`.
 - **moveSpeed**: `Float` - Velocidad de desplazamiento de la capa cuando la cámara se mueve.
 
 #### Propiedades:
@@ -1022,16 +1079,28 @@ constructor(name, pos, scale, image, moveSpeed)
     background.add_child(layer1); // se añade al objeto background
  ```
 
+#### Ejemplo de uso con SpriteSheet:
+ ```javascript
+    // dentro de la funcion ready de la escena
+    fondo = new SpriteSheet("fondo", new Vector2(), new Vector2(1, 1), new Vector2(800, 600), "./assets/tileset.png");
+        
+    let bg = new ParallaxBackground("bg", new Vector2());
+    this.add_child(bg);
+
+    let layer = new ParallaxLayer("layer1", new Vector2(), new Vector2(config.width, config.height), fondo, 1);
+    bg.add_child(layer);
+ ```
+
 ### `AudioPlayer`
 
 `AudioPlayer` es una clase utilizada para manejar la reproducción de sonidos dentro del juego. Permite reproducir, detener y ajustar el volumen de los sonidos en función de la distancia del objeto con respecto a la cámara, lo que simula un efecto de proximidad auditiva.
 
 #### Constructor:
 ```javascript
-constructor(name, pos, audio, loop = false)
+constructor(name, position, audio, loop = false)
 ```
 - **name**: `String` - Nombre del objeto de audio.
-- **pos**: `Vector2` - Posición inicial del audio en el juego.
+- **position**: `Vector2` - Posición inicial del audio en el juego.
 - **audio**: `String` - Ruta del archivo de audio a reproducir.
 - **loop**: `Boolean` - Determina si el audio debe repetirse en bucle. Por defecto, es `false`.
 
@@ -1041,9 +1110,9 @@ constructor(name, pos, audio, loop = false)
 
 #### Metodos:
 
- - `setLoop`: Ajusta si el audio debe repetirse en bucle.
- - `play`: Reproduce el sonido si no está ya en reproducción y si el objeto es visible para la cámara. Si el sonido no está en bucle, se reproduce solo una vez.
- - `stop`: Detiene el sonido.
+ - `setLoop(boolean)`: Ajusta si el audio debe repetirse en bucle.
+ - `play()`: Reproduce el sonido si no está ya en reproducción y si el objeto es visible para la cámara. Si el sonido no está en bucle, se reproduce solo una vez.
+ - `stop()`: Detiene el sonido.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -1066,9 +1135,9 @@ constructor(name, pos, audio, loop = false)
 
 #### Constructor:
 ```javascript
-constructor(pos, color)
+constructor(position, color)
 ```
-- **pos**: `Vector2` - La posición inicial donde se emiten las partículas.
+- **position**: `Vector2` - La posición inicial donde se emiten las partículas.
 - **color**: `String` - El color de las partículas en RGB, ejemplo: "255, 255, 255".
 
 #### Propiedades:
@@ -1077,7 +1146,7 @@ constructor(pos, color)
 
 #### Metodo:
 
- - `emit`: Genera nuevas partículas en la posición actual.
+ - `emit()`: Genera nuevas partículas en la posición actual.
 
 #### Ejemplo de Uso:
  ```javascript
@@ -1095,12 +1164,12 @@ constructor(pos, color)
 
 #### Constructor:
 ```typescript
-constructor(name, pos, scale, layer, mask, type)
+constructor(name, position, size, layer, mask, type)
 ```
 
 - **name**: `String` - Nombre del colisionador.
-- **pos**: `Vector2` - Posición inicial del colisionador.
-- **scale**: `Vector2` - Tamaño del colisionador.
+- **position**: `Vector2` - Posición inicial del colisionador.
+- **size**: `Vector2` - Tamaño del colisionador.
 - **layer**: `Int` - Capa de colisión en la que se encuentra el colisionador.
 - **mask**: `Array` o `Int` - Máscara de colisión, puede ser un array o un número que define con qué capas puede colisionar.
 - **type**: `String` - Tipo de colisionador, por defecto es `Trigger`, pero puede tener otros valores como `Static`, `Plataform`, `CharacterBody` y `RigidBody`.
@@ -1120,9 +1189,9 @@ constructor(name, pos, scale, layer, mask, type)
 
 #### Metodos:
 
- - `set_collision_mask`: Añade una nueva máscara de colisión.
- - `is_trigger_enter`: funcion `undefined` que deve ser creada por el usuario que se ejecuta si un collider entra en otro.
- - `is_trigger_exit`: funcion `undefined` que deve ser creada por el usuario que se ejecuta cuando un collider sale de otro.
+ - `set_collision_mask(valor)`: Añade una nueva máscara de colisión.
+ - `is_trigger_enter(body)`: funcion `undefined` que deve ser creada por el usuario que se ejecuta si un collider entra en otro.
+ - `is_trigger_exit(body)`: funcion `undefined` que deve ser creada por el usuario que se ejecuta cuando un collider sale de otro.
 
  #### Ejemplo de Uso Colision Trigger:
  ```javascript
@@ -1152,3 +1221,19 @@ constructor(name, pos, scale, layer, mask, type)
     }
 
  ```
+
+## Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT. Esto significa que puedes usar, modificar y distribuir el software libremente, siempre y cuando incluyas una copia de la licencia original. Consulta el archivo `LICENSE` para obtener más detalles.
+
+```plaintext
+MIT License
+
+Copyright (c) [2024] [TorradoProjects]
+
+Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia de este software y los archivos de documentación asociados (el "Software"), para tratar el Software sin restricción, incluyendo sin limitación los derechos de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del Software, y permitir a las personas a quienes se les proporcione el Software hacer lo mismo, sujeto a las siguientes condiciones:
+
+Se debe incluir el aviso de derechos de autor anterior y este aviso de permiso en todas las copias o partes sustanciales del Software.
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, PERO NO LIMITADO A, LAS GARANTÍAS DE COMERCIABILIDAD, ADECUACIÓN PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS AUTORES O TITULARES DEL COPYRIGHT SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE OTRO MODO, DERIVADA DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTRO TIPO DE ACCIONES EN EL SOFTWARE.
+
