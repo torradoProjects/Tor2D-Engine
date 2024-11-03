@@ -591,8 +591,8 @@ constructor(name, position, size, texture_normal, texture_pressed)
 - **name**: `String` - Nombre del botón para su identificación.
 - **position**: `Vector2` - Posición en pantalla donde se dibujará el botón.
 - **size**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
-- **texture_normal**: `path_to_image` - La textura que se muestra cuando el botón no está presionado.
-- **texture_pressed**: `path_to_image` - La textura que se muestra cuando el botón está presionado.
+- **texture_normal**: `path_to_image` o `SpriteSheet` - Textura o objeto `SpriteSheet` que se muestra cuando el botón no está presionado.
+- **texture_pressed**: `path_to_image` o `SpriteSheet` - Textura o objeto `SpriteSheet` que se muestra cuando el botón está presionado.
 
 #### Propiedades:
 
