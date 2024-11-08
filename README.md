@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # TOR2D
 Un motor de juego 2D ligero escrito en JavaScript.
 
