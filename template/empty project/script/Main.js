@@ -17,11 +17,11 @@ let Main =
     {
         let texto = new Label("¡Hola mundo!", new Vector2(200, 200), 50, "Verdana", "blue");
         this.add_child(texto);
-        
+
     },
     process(delta) // procesa la logica de tu juego
     {
-        
+       
     }
 };
 tor2d.start(Main);

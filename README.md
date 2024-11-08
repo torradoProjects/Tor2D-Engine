@@ -6,7 +6,7 @@ TOR2D es un motor de juego 2D ligero escrito en JavaScript, ideal para crear jue
 
 ## Características principales
 - Fácil de integrar y comenzar a desarrollar juegos.
-- Funcionalidad de física básica con el método `move_and_slide()` para gestionar el movimiento y la fricción.
+- Funcionalidad de física básica.
 - Manejo sencillo de sprites y animaciones.
 - Detección de colisiones entre objetos del juego.
 - Soporte para guardar datos de juego utilizando LocalStorage.
@@ -27,11 +27,7 @@ Incluir en tu proyecto
 ```
 ## Ejemplo de uso
 
-A continuación, se muestra un ejemplo básico de cómo configurar y usar el motor Tor2D para crear un juego sencillo con animaciones, colisiones y controles de teclado.
-
-### Configuración
-
-Primero, se debe definir una configuración básica para el juego, que incluye el contenedor de el  lienzo donde se va a renderizar, el tamaño de la ventana, y otras opciones como el suavisado de texturas y el debug para mostrar colisiones y contador de FPS y el color del fondo:
+A continuación, se muestra un ejemplo básico de cómo configurar y usar el motor Tor2D para crear un juego sencillo.
 
 ```javascript
 let config = {
@@ -67,9 +63,24 @@ let Main =
 tor2d.start(Main); // inicia la escena Main 
 ```
 
+### Configuración
+
+Primero, se debe definir una configuración básica para el juego, que incluye el contenedor de el  lienzo donde se va a renderizar, el tamaño de la ventana, y otras opciones como el suavisado de texturas y el debug para mostrar colisiones y contador de FPS y el color del fondo:
+
+```javascript
+let config = {
+    container: "contenedor",
+    width: 800,
+    height: 600,
+    texture_filter: false,
+    debugs: false,
+    color: "gray"
+};
+```
+
 ## Funciones principales
 
-Tor2D incluye una serie de funciones útiles para el desarrollo de juegos 2D. A continuación se presentan las más importantes:
+TOR2D incluye una serie de funciones útiles para el desarrollo de juegos 2D. A continuación se presentan las más importantes:
 
 ### `TOR2D(config)`
 Constructor principal que inicializa el motor con la configuración especificada. Recibe un objeto `config` que debe contener los siguientes parámetros:
@@ -145,6 +156,36 @@ let gameScene =
 let tor2d = new TOR2D(config); // se crea el motor de juego
 tor2d.add_scene(gameScene); // se añade la escena gameScene al arbol de escenas
 tor2d.start(menuScene); // se inicia la escena menuScene como principal
+```
+
+### `reload_scene()`
+
+Este método permite recargar la escena que se encuetra en ejecución.
+
+#### Ejemplo de uso:
+
+```javascript
+let gameOver = false;
+let mainScene = 
+{
+  name: "MainScene",
+  ready() 
+  {
+    let player = new AnimatedSprite("player", new Vector2(100, 100), new Vector2(50, 50), [animIdle], 0.1);
+    this.add_child(player);
+  },
+  process(delta) // Lógica de actualización por fotograma
+  {
+    
+    if (Input.isKeyDown("Space") && gameOver) // recarga la escena si se presiona la tecla espacio y la variable gameOver es true
+    {
+      tor2d.reload_scene();
+    }
+  }
+};
+
+let tor2d = new TOR2D(config);
+tor2d.start(mainScene); // Inicia el motor de juego con la escena 'mainScene'
 ```
 
 ### `start(scene)`
@@ -537,8 +578,6 @@ constructor(name, position, size, color, borderColor, pressedColor)
 
  - **visible**: Determina si el objeto es visible o no, (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
- - **is_action_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
- - **is_action_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
  - **disabled**: Desactiva el boton, por defecto es `false`.
  - **scale**: Escala el tamaño del boton, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
@@ -561,7 +600,9 @@ button.is_action_released = function() {
 
  #### Metodos:
 
- - `isPressed()`: funcion que devuelve `true` si es presionado.
+ - `isPressed()`: funcion que devuelve `true` si se mantiene precionado el boton.
+ - `isDown()`: funcion que devuelve `true` una unica vez si el boton es precionado.
+ - `isUp()`: funcion que devuelve `true` una unica vez si el boton es soltado.
  - `add_child(objeto)`: Añade un objeto hijo a el boton. Este método solo permite el  objeto `Label`. 
  - `setRotation(grados)`: Aplica una rotacion segun los grados.
 
@@ -574,9 +615,18 @@ this.add_child(button); // se añade a la escena
 // dentro de la funcion process de la escena
 if (button.isPressed())
 {
-    console.log("Botón presionado");
-} else console.log("Botón soltado");
+    console.log("el boton se mantiene precionado");
+} 
 
+if (button.isDown()) 
+{
+    console.log("el boton se preciono");
+}
+
+if (button.isUp()) 
+{
+    console.log("el boton se solto");
+}
  ```
 
 ### `TextureButton`
@@ -591,36 +641,21 @@ constructor(name, position, size, texture_normal, texture_pressed)
 - **name**: `String` - Nombre del botón para su identificación.
 - **position**: `Vector2` - Posición en pantalla donde se dibujará el botón.
 - **size**: `Vector2` - Tamaño del botón, definido por su ancho y alto.
-- **texture_normal**: `path_to_image` - La textura que se muestra cuando el botón no está presionado.
-- **texture_pressed**: `path_to_image` - La textura que se muestra cuando el botón está presionado.
+- **texture_normal**: `path_to_image` o `SpriteSheet` - Textura o objeto `SpriteSheet` que se muestra cuando el botón no está presionado.
+- **texture_pressed**: `path_to_image` o `SpriteSheet` - Textura o objeto `SpriteSheet` que se muestra cuando el botón está presionado.
 
 #### Propiedades:
 
  - **visible**: Determina si el objeto es visible o no (booleano), por defecto todos son `true`.
  - **layer**: La capa en la que se renderiza el objeto, por defecto todos son `0`.
- - **is_action_pressed**: funcion `undefined` que es creada por el usuario que se ejecuta cuando esta presionado.
- - **is_action_released**: funcion `undefined` que es creada por el usuario que se ejecuta cuando es soltado.
  - **disabled**: Desactiva el boton, por defecto es `false`.
  - **scale**: Escala el tamaño del boton, el valor maximo es `1` y el minimo `0.1`, por defecto es `1`.
 
- #### Ejemplo de Uso:
- ```javascript
- // dentro de la funcion ready de la escena
-let button = new Button("playButton", new Vector2(50, 50), new Vector2(150, 50), "buttonNormal.png", "buttonPressed.png");
-this.add_child(button); // se añade a la escena
-
-// dentro de la funcion ready o process de la escena
-button.is_action_pressed = function() {
-    console.log("Botón presionado");
-};
-
-button.is_action_released = function() {
-    console.log("Botón soltado");
-};
- ```
 #### Metodos:
 
- - `isPressed()`: funcion que devuelve `true` si es presionado.
+ - `isPressed()`: funcion que devuelve `true` si se mantiene precionado el boton.
+ - `isDown()`: funcion que devuelve `true` una unica vez si el boton es precionado.
+ - `isUp()`: funcion que devuelve `true` una unica vez si el boton es soltado.
  - `add_child(objeto)`: Añade un objeto hijo a el boton. Este método solo permite el  objeto `Label`. 
  - `setRotation(grados)`: Aplica una rotacion segun los grados.
 
@@ -633,10 +668,19 @@ this.add_child(button); // se añade a la escena
 // dentro de la funcion process de la escena
 if (button.isPressed())
 {
-    console.log("Botón presionado");
-} else console.log("Botón soltado");
+    console.log("el boton se mantiene precionado");
+} 
 
- ```
+if (button.isDown()) 
+{
+    console.log("el boton se preciono");
+}
+
+if (button.isUp()) 
+{
+    console.log("el boton se solto");
+}
+```
 
 ### `Joystick`
 
@@ -1096,10 +1140,9 @@ constructor(name, position, size, path, moveSpeed)
 
 #### Constructor:
 ```javascript
-constructor(name, position, audio, loop = false)
+constructor(name, audio, loop = false)
 ```
 - **name**: `String` - Nombre del objeto de audio.
-- **position**: `Vector2` - Posición inicial del audio en el juego.
 - **audio**: `String` - Ruta del archivo de audio a reproducir.
 - **loop**: `Boolean` - Determina si el audio debe repetirse en bucle. Por defecto, es `false`.
 
@@ -1116,14 +1159,14 @@ constructor(name, position, audio, loop = false)
 #### Ejemplo de Uso:
  ```javascript
     // dentro de la funcion ready de la escena
-    musica_fondo = new AudioPlayer("music", new Vector2(), "music.mp3", true);
+    musica_fondo = new AudioPlayer("music", "music.mp3", true);
     this.add_child(musica_fondo);
     musica_fondo.play();
 
     // añadir sonido a un objeto
     pelota = new Sprite("pelota", new Vector2(100, 100), new Vector2(50, 50), "pelota.png");
     this.add_child(pelota);
-    sound = new AudioPlayer("sound", new Vector2(), "music.mp3", false);
+    sound = new AudioPlayer("sound", "music.mp3", false);
     pelota.add_child(sound);
     sound.play();
  ```
@@ -1235,4 +1278,3 @@ Se otorga permiso, de forma gratuita, a cualquier persona que obtenga una copia 
 Se debe incluir el aviso de derechos de autor anterior y este aviso de permiso en todas las copias o partes sustanciales del Software.
 
 EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA, INCLUYENDO, PERO NO LIMITADO A, LAS GARANTÍAS DE COMERCIABILIDAD, ADECUACIÓN PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS AUTORES O TITULARES DEL COPYRIGHT SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑO O OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O DE OTRO MODO, DERIVADA DE, FUERA DE O EN CONEXIÓN CON EL SOFTWARE O EL USO U OTRO TIPO DE ACCIONES EN EL SOFTWARE.
-
