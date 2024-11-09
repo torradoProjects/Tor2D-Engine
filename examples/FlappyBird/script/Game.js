@@ -171,6 +171,7 @@ let Game =
        // boton para volver al menu
        let imgMenu = new SpriteSheet("btnMenu", new Vector2(21, 9), new Vector2(1, 1), new Vector2(15.9, 15.5), "./assets/flappy.png");
        boton_menu = new TextureButton("boton_menu", new Vector2(ventana.size.x - 50, ventana.size.y + 100), new Vector2(80, 80), imgMenu, imgMenu);
+       boton_menu.disabled = true;
        ventana.add_child(boton_menu);
 
        // muestra las imagenes del tutorial una unica vez al entrar a la escena Game
@@ -270,6 +271,7 @@ let Game =
             boton_replay.disabled = false;
             boton_pause.visible = false;
             boton_pause.disabled = true;
+            boton_menu.disabled = false;
         } 
 
         // Elimina los tubos que están fuera de la pantalla
@@ -322,7 +324,7 @@ let Game =
         } 
         
         // boton menu, vuelve a la escena menu
-        if (boton_menu.isDown()) tor2d.change_scene(Menu);
+        if (boton_menu.isDown() && gameover) tor2d.change_scene(Menu);
     }
 };
 
