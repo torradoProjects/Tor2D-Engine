@@ -1,6 +1,6 @@
 {
   "name": "tor2d-engine",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "webpack.config.js",
   "directories": {
     "lib": "lib"

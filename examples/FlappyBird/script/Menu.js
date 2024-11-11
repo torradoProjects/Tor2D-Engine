@@ -25,7 +25,7 @@ let Menu =
         play = new TextureButton("play", new Vector2((config.width/2)- 50, 300), new Vector2(100, 80), playImg, playImg);
         this.add_child(play);
 
-        let nota = new Label("Este es un pequeño ejemplo del uso de TOR2D version 2.0.1.",new Vector2(5, config.height - 50), 10,"Verdana", "black");
+        let nota = new Label("Este es un pequeño ejemplo del uso de TOR2D version 2.0.2.",new Vector2(5, config.height - 50), 10,"Verdana", "black");
         let nota2 = new Label("creditos de los Assets a sus respectivos dueños.",new Vector2(5, config.height - 30), 10,"Verdana", "black");
         this.add_child(nota);
         this.add_child(nota2);
