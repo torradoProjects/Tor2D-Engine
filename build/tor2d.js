@@ -1,5 +1,5 @@
 /*
-TOR2D-js 2.0.2 by @TorradoProjects
+TOR2D-js 2.0.2 by @TorradoProjects 
 https://torradoprojects.github.io/site/
 Licencia MIT
 

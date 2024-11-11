@@ -18,7 +18,7 @@ Para comenzar a utilizar TOR2D, puedes clonar el repositorio desde GitHub:
 
 ```bash
 git clone https://github.com/torradoProjects/Tor2D-Engine.git
-cd Tor2D
+cd Tor2D-Engine
 
 ```
 Incluir en tu proyecto
